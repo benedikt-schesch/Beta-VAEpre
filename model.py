@@ -60,7 +60,7 @@ class BetaVAE(nn.Module):
         return (recon_loss + self.beta * kl_diverge) / x.shape[0]  # divide total loss by batch size
 
 class DNN(nn.Module):
-    def __init__(self, neruons_num, dropout_prob):
+    def __init__(self, neurons_num, dropout_prob):
         super().__init__()
 
         self.codename = 'dnn'
