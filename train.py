@@ -1,19 +1,22 @@
-import torch
-import torch.optim
-from  torch.utils.data.dataloader import DataLoader
 import pandas as pd
 import category_encoders as ce
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 import numpy as np
-from model import BetaVAE
 from sklearn import preprocessing
+from trainers import *
 
 
-BATCH_SIZE = 4
-NUM_EPOCHS = 200
-LR = 0.001
-BETA = 1
+args = {}
+args["batch_size"] = 32
+args["epochs"] = 40
+args["augmentation_factor"] = 2
+args["lr"] = 0.001
+args["beta"] = 1
+args["dropout"] = 0
+args["neurons_num"] = [48,32]
+args["weight_decay"] = 1e-5
+
 
 dataset_path = "xAPI-Edu-Data.csv"
 
@@ -35,31 +38,20 @@ print("Data Imbalance: ",100*(1-sum(Y)/len(Y)),"%")
 
 X = preprocessing.normalize(X)
 X_train, X_test, y_train, y_test = train_test_split(X.astype(np.float32),Y,test_size=0.25, stratify = Y,random_state=0)
+print("Data Train Imbalance: ",100*(1-sum(y_train)/len(y_train)),"%")
+print("Data Test Imbalance: ",100*(1-sum(y_test)/len(y_test)),"%")
+
 
 at_risk_student_id = np.nonzero(y_train == 0)[0]
-train_loader =  DataLoader([X_train[i] for i in at_risk_student_id], batch_size=BATCH_SIZE)
+X_at_risk_student = X_train[at_risk_student_id]
 
-model = BetaVAE(feature_dim=len(X_train[0]),beta=BETA)
-optimizer = torch.optim.Adam(model.parameters(),lr=LR)
+X_at_risk_augmented = augment_betaVAE(X_at_risk_student.astype(np.float32),args=args)
 
-for epoch in range(NUM_EPOCHS):
-    loop = tqdm(train_loader)
-    for idx, x in enumerate(loop):        
-        #reset gradients
-        optimizer.zero_grad()
-        
-        #forward propagation through the network
-        out, mu, logvar = model(x)
-        
-        #calculate the loss
-        loss = model.loss(out, x, mu, logvar)
-        
-        #backpropagation
-        loss.backward()
-        
-        #update the parameters
-        optimizer.step()
-        
-        # add stuff to progress bar in the end
-        loop.set_description(f"Epoch [{epoch}/{NUM_EPOCHS}]")
-        loop.set_postfix(loss=loss.item())
+X_train_augmented = np.concatenate([X_at_risk_augmented,np.stack([X_train[i] for i in range(len(X_train)) if i not in at_risk_student_id])])
+y_train_augmented = np.array([0 for i in X_at_risk_augmented]+[1 for i in range(len(X_train)) if i not in at_risk_student_id])
+args["neurons_num"] = [len(X_train_augmented[0])]+args["neurons_num"]
+print("Data Augmented Train Imbalance: ",100*(1-sum(y_train_augmented)/len(y_train_augmented)),"%")
+
+final_acc = train_and_eval_NN(X_train_augmented,y_train_augmented,X_test,y_test,args)
+
+print("Final Accuracy ",final_acc)

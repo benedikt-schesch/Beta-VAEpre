@@ -68,14 +68,14 @@ class DNN(nn.Module):
         self.layers = nn.Sequential(
             nn.LazyLinear(neurons_num[0]),
             nn.ReLU(),
-            nn.Dropout(dropout_prob[0]),
+            nn.Dropout(dropout_prob),
             nn.Linear(neurons_num[0], neurons_num[1]),
             nn.ReLU(),
-            nn.Dropout(dropout_prob[1]),
+            nn.Dropout(dropout_prob),
             nn.Linear(neurons_num[1], neurons_num[2]),
             nn.ReLU(),
-            nn.Dropout(dropout_prob[2]),
-            nn.Linear(neurons_num[2], 1)
+            nn.Dropout(dropout_prob),
+            nn.Linear(neurons_num[2], 2)
         )
     
     def forward(self, batch):
