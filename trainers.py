@@ -5,6 +5,7 @@ from  torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
 import numpy as np
 from models import *
+import sklearn.metrics
 
 def augment_betaVAE(X,args):
     train_loader =  DataLoader(X, batch_size=args["batch_size"])
@@ -34,24 +35,33 @@ def augment_betaVAE(X,args):
             loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
             loop.set_postfix(loss=loss.item())
     augmented_samples = []
+    total_loss = 0
+    model.eval()
     with torch.no_grad():
         for i in range(args["augmentation_factor"]):
             for x in train_loader:
                 out, _, _ = model(x)
                 augmented_samples.append(out.numpy())
-
-    return np.concatenate(augmented_samples+[X])
+        for x in train_loader:
+            out, mu, logvar = model(x)
+            loss = model.loss(out, x, mu, logvar)
+            total_loss += loss.item()
+    model.train()
+    return np.concatenate(augmented_samples+[X]), total_loss/len(train_loader), model
 
 def eval_NN(model,X,y,args):
     test_loader =  DataLoader([[X[i],y[i]] for i in range(len(y))], 
                                 batch_size=args["batch_size"])
     correct = 0
+    y1 = []
+    y_true1 = []
     with torch.no_grad():
         for x, y_true in test_loader:
             out = model(x)
             correct += (torch.argmax(out,1) == y_true).sum().item()
-                
-    return correct/len(y)
+            y1.append(torch.argmax(out,1))
+            y_true1.append(y_true)
+    return correct/len(y), sklearn.metrics.f1_score(torch.cat(y_true1),torch.cat(y1)), sklearn.metrics.balanced_accuracy_score(torch.cat(y_true1),torch.cat(y1))
 
 def train_and_eval_NN(X,y,X_test,y_test,args):
     train_loader =  DataLoader([[X[i],y[i]] for i in range(len(y))], 
