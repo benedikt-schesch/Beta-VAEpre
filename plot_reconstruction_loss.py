@@ -43,7 +43,7 @@ X_at_risk_student = X_train[at_risk_student_id]
 losses = []
 for beta in betas:
     args["beta"] = beta
-    _, loss = augment_betaVAE(X_at_risk_student.astype(np.float32),args=args)
+    _, loss, _ = augment_betaVAE(X_at_risk_student.astype(np.float32),args=args)
     losses.append(loss)
 
 plt.figure()
