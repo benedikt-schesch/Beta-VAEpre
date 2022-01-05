@@ -12,16 +12,16 @@ np.random.seed(SEED)
 
 args = {}
 args["batch_size"] = 8
-args["epochs"] = 1
-args["augmentation_factor"] = 3
+args["epochs"] = 1000
+args["augmentation_factor"] = 2
 args["lr"] = 0.001
-args["beta"] = 1
+args["beta"] = 2
 args["dropout"] = 0
 args["neurons_num"] = [48,32]
 args["weight_decay"] = 0
 
 
-dataset_path = "student-por.csv"
+dataset_path = "xAPI-Edu-Data.csv"
 
 X, Y = load_data(dataset_path)
 
@@ -47,12 +47,15 @@ y_train_augmented = np.array([0 for i in X_at_risk_augmented]+[1 for i in range(
 args["neurons_num"] = [len(X_train_augmented[0])]+args["neurons_num"]
 print("Data Augmented Train Imbalance: ",100*(1-sum(y_train_augmented)/len(y_train_augmented)),"%")
 
-final_acc3 = train_and_eval_NN_undersampling(X_train,y_train,X_test,y_test,args)
-final_acc3 = train_and_eval_NN_oversampling(X_train,y_train,X_test,y_test,args)
-final_acc3 = train_and_eval_NN_class_weights(X_train,y_train,X_test,y_test,args)
-final_acc = train_and_eval_NN(X_train_augmented,y_train_augmented,X_test,y_test,args)
-final_acc2 = train_and_eval_NN(X_train,y_train,X_test,y_test,args)
+results_undersampling = train_and_eval_NN_undersampling(X_train,y_train,X_test,y_test,args)
+results_oversampling = train_and_eval_NN_oversampling(X_train,y_train,X_test,y_test,args)
+results_class_weights = train_and_eval_NN_class_weights(X_train,y_train,X_test,y_test,args)
+results_ours = train_and_eval_NN(X_train_augmented,y_train_augmented,X_test,y_test,args)
+results_normal = train_and_eval_NN(X_train,y_train,X_test,y_test,args)
 
 
-print("Final Scores with augmentation",final_acc)
-print("Final Scores w/o augmentation ",final_acc2)
+print("Final Scores with augmentation",results_ours)
+print("Final Scores w/o augmentation ",results_normal)
+print("Final Scores Undersampling ",results_undersampling)
+print("Final Scores Oversampling ",results_oversampling)
+print("Final Scores Class weights ",results_class_weights)
