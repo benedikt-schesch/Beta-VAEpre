@@ -12,7 +12,7 @@ np.random.seed(SEED)
 
 args = {}
 args["batch_size"] = 8
-args["epochs"] = 1000
+args["epochs"] = 1
 args["augmentation_factor"] = 3
 args["lr"] = 0.001
 args["beta"] = 1
@@ -47,6 +47,9 @@ y_train_augmented = np.array([0 for i in X_at_risk_augmented]+[1 for i in range(
 args["neurons_num"] = [len(X_train_augmented[0])]+args["neurons_num"]
 print("Data Augmented Train Imbalance: ",100*(1-sum(y_train_augmented)/len(y_train_augmented)),"%")
 
+final_acc3 = train_and_eval_NN_undersampling(X_train,y_train,X_test,y_test,args)
+final_acc3 = train_and_eval_NN_oversampling(X_train,y_train,X_test,y_test,args)
+final_acc3 = train_and_eval_NN_class_weights(X_train,y_train,X_test,y_test,args)
 final_acc = train_and_eval_NN(X_train_augmented,y_train_augmented,X_test,y_test,args)
 final_acc2 = train_and_eval_NN(X_train,y_train,X_test,y_test,args)
 
