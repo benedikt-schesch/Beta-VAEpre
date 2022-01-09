@@ -63,11 +63,11 @@ def eval_NN(model,X,y,args):
             correct += (torch.argmax(out,1) == y_true).sum().item()
             y1.append(torch.argmax(out,1))
             y_true1.append(y_true)
-    return {"Accuracy: ":correct/len(y),
-    "F1 score: ":sklearn.metrics.f1_score(torch.cat(y_true1),torch.cat(y1)), 
-    "Balanced Accuracy: ":sklearn.metrics.balanced_accuracy_score(torch.cat(y_true1),torch.cat(y1)), 
-    "Precision: ":sklearn.metrics.precision_score(torch.cat(y_true1),torch.cat(y1)),
-    "Recall: ":sklearn.metrics.recall_score(torch.cat(y_true1),torch.cat(y1))}
+    return {"Accuracy":correct/len(y),
+    "F1 score":sklearn.metrics.f1_score(torch.cat(y_true1),torch.cat(y1)), 
+    "Balanced Accuracy":sklearn.metrics.balanced_accuracy_score(torch.cat(y_true1),torch.cat(y1)), 
+    "Precision":sklearn.metrics.precision_score(torch.cat(y_true1),torch.cat(y1)),
+    "Recall":sklearn.metrics.recall_score(torch.cat(y_true1),torch.cat(y1))}
 
 def train_and_eval_NN(X,y,X_test,y_test,args):
     train_loader =  DataLoader([[X[i],y[i]] for i in range(len(y))], 

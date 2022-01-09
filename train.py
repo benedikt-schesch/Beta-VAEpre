@@ -5,10 +5,8 @@ from trainers import *
 from sklearn.model_selection import train_test_split
 import random
 
-SEED = 0
-random.seed(SEED)
-torch.manual_seed(SEED)
-np.random.seed(SEED)
+SEED = 42
+seed_everything(SEED)
 
 args = {}
 args["batch_size"] = 8
@@ -21,7 +19,8 @@ args["neurons_num"] = [48,32]
 args["weight_decay"] = 0
 
 
-dataset_path = "xAPI-Edu-Data.csv"
+#dataset_path = "xAPI-Edu-Data.csv"
+dataset_path = "student-por.csv"
 
 X, Y = load_data(dataset_path)
 
@@ -30,8 +29,8 @@ print("Data Imbalance: ",100*(1-sum(Y)/len(Y)),"%")
 
 X = preprocessing.normalize(X)
 
-X_train, X_test, y_train, y_test = balanced_train_test_generator(X,Y)
-#X_train, X_test, y_train, y_test = train_test_split(X.astype(np.float32),Y,test_size=0.25, stratify = Y,random_state=SEED)
+#X_train, X_test, y_train, y_test = balanced_train_test_generator(X,Y)
+X_train, X_test, y_train, y_test = train_test_split(X.astype(np.float32),Y,test_size=0.25, stratify = Y,random_state=SEED)
 print("Data Train Imbalance: ",100*(1-sum(y_train)/len(y_train)),"%")
 print("Data Test Imbalance: ",100*(1-sum(y_test)/len(y_test)),"%")
 print("Proportion of test size: ",100*len(y_test)/(len(y_test)+len(y_train))," %")
@@ -59,3 +58,8 @@ print("Final Scores w/o augmentation ",results_normal)
 print("Final Scores Undersampling ",results_undersampling)
 print("Final Scores Oversampling ",results_oversampling)
 print("Final Scores Class weights ",results_class_weights)
+data = [results_ours,results_normal,results_undersampling,results_oversampling,results_class_weights]
+frame = pd.DataFrame.from_dict(data,orient='columns')
+frame.index = ["With augmentation (ours)","Without augmentation","Undersampling","Oversampling","Class weights"]
+frame.to_csv("RESULTS_"+dataset_path)
+print(frame)

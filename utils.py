@@ -2,6 +2,9 @@ import pandas as pd
 import category_encoders as ce
 import numpy as np
 import random
+import os
+import numpy as np
+import torch
 
 def load_data(path):
     if path == "xAPI-Edu-Data.csv":
@@ -39,3 +42,12 @@ def balanced_train_test_generator(X,Y):
     y_train = Y[np.concatenate((X_train_risk_id,X_train_non_risk_id))]
     y_test = Y[np.concatenate((X_test_risk_id,X_test_non_risk_id))]
     return X_train, X_test, y_train, y_test
+
+def seed_everything(seed: int):    
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
