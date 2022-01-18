@@ -31,8 +31,8 @@ print("Data Imbalance: ",100*(1-sum(Y)/len(Y)),"%")
 
 X = preprocessing.normalize(X)
 
-X_train, X_test, y_train, y_test = balanced_train_test_generator(X,Y)
-#X_train, X_test, y_train, y_test = train_test_split(X.astype(np.float32),Y,test_size=0.25, stratify = Y,random_state=SEED)
+#X_train, X_test, y_train, y_test = balanced_train_test_generator(X,Y)
+X_train, X_test, y_train, y_test = train_test_split(X.astype(np.float32),Y,test_size=0.25, stratify = Y,random_state=SEED)
 print("Data Train Imbalance: ",100*(1-sum(y_train)/len(y_train)),"%")
 print("Data Test Imbalance: ",100*(1-sum(y_test)/len(y_test)),"%")
 

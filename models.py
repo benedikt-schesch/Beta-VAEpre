@@ -60,15 +60,19 @@ class BetaVAE(nn.Module):
         return (recon_loss + self.beta * kl_diverge) / x.shape[0]  # divide total loss by batch size
     
     def traversal(self, x, dimension, range, steps):
-        result = []
-        mu, logvar = self.encode(x)
-        z = self.sample(mu, logvar)
-        values = torch.linspace(-range, range, steps)
-        for i in values:
-            z[dimension] = i
-            rx = self.decode(z)
-            result.append(rx)
-        return result
+        results = []
+        for student in x:
+            res = []
+            mu, logvar = self.encode(student)
+            std = torch.exp(0.5*logvar)
+            z = self.sample(mu, logvar)
+            values = torch.linspace(-range, range, steps)
+            for i in values:
+                z[dimension] = mu[dimension]+i*std[dimension]
+                rx = self.decode(z)
+                res.append(rx)
+            results.append(res)
+        return results
 
 class DNN(nn.Module):
     def __init__(self, neurons_num, dropout_prob):
@@ -77,6 +81,10 @@ class DNN(nn.Module):
         self.codename = 'dnn'
 
         self.layers = nn.Sequential(
+            nn.LazyLinear(neurons_num[0]),
+            nn.LeakyReLU(),
+            nn.LazyLinear(neurons_num[1]),
+            nn.LeakyReLU(),
             nn.LazyLinear(2)
         )
     

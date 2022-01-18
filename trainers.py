@@ -10,7 +10,7 @@ import random
 from  sklearn.utils import class_weight
 
 
-def augment_betaVAE(X,args):
+def augment_betaVAE(X,args,eval=False):
     train_loader =  DataLoader(X, batch_size=args["batch_size"])
     num_epochs = args["epochs"]
     model = BetaVAE(feature_dim=len(X[0]),beta=args["beta"])
@@ -49,6 +49,8 @@ def augment_betaVAE(X,args):
             loss = model.loss(out, x, mu, logvar)
             total_loss += loss.item()
     model.train()
+    if eval:
+        return np.concatenate(augmented_samples), total_loss/len(train_loader), model
     return np.concatenate(augmented_samples+[X]), total_loss/len(train_loader), model
 
 def eval_NN(model,X,y,args):

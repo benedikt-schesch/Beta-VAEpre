@@ -23,10 +23,10 @@ def load_data(path):
             "nursery","internet","activities","higher","romantic","reason"]
         encoder_var = ce.OneHotEncoder(cols=one_hot_columns,return_df=True,use_cat_names=True)
         feature_df = encoder_var.fit_transform(df[one_hot_columns])
-        feature_df = feature_df.join(df[[col for col in list(df.columns) if col not in one_hot_columns]])
+        feature_df = feature_df.join(df[[col for col in list(df.columns)[:-1] if col not in one_hot_columns]])
         X = feature_df.to_numpy()
         Y = (df["G3"]>=10).to_numpy().astype(int)
-    return X, Y
+    return X, Y, feature_df
 
 def balanced_train_test_generator(X,Y):
     at_risk_student_id = np.nonzero(Y == 0)[0]
