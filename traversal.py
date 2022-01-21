@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 from sklearn import preprocessing
+from sympy import latex
 from utils import *
 from trainers import *
 import random
@@ -24,8 +25,6 @@ args["lr"] = 0.001
 args["dropout"] = 0
 args["beta"] = 2
 args["neurons_num"] = [48,32]
-args["weight_decay"] = 0
-
 
 dataset_path = "student-por.csv"
 #dataset_path = "xAPI-Edu-Data.csv"
@@ -49,24 +48,13 @@ X_non_at_risk_student = X_train[[i for i in range(len(X_train)) if i not in at_r
 
 augmented_data, loss, model = augment_betaVAE(X_at_risk_student.astype(np.float32),args=args,eval=True)
 
-# res = model.traversal(torch.tensor(X_at_risk_student[0]),0,3,10)
-# fig, axs = plt.subplots(len(res[0]))
-# fig.set_figheight(150)
-# fig.set_figwidth(10)
-# ymin, ymax = 10000000, 0
-# std = []
-# for i in range(len(res[0])):
-#     ymin = min(ymin,min([data[i].item() for data in res]))
-#     ymax = max(ymax,max([data[i].item() for data in res]))
-# for i in range(len(res[0])):
-#     axs[i].set_title("Dimension "+str(i))
-#     axs[i].plot([data[i].item() for data in res])
-#     axs[i].set_ylim([ymin, ymax])
-#     std.append(np.std([data[i].item() for data in res]))
-# plt.savefig("Reconstructions.png")
-# plt.close()
 plt.figure()
 best_perf = set({})
+latex_table = "Latent variable"
+TOPK = 2
+for i in range(TOPK):
+    latex_table += " & Feature name (Standard deviation)"
+latex_table += "\\\\ \n \\hline \n"
 for i in range(model.latent_size):
     res = model.traversal(torch.tensor(X_at_risk_student),i,3,10)
     std = []
@@ -75,23 +63,29 @@ for i in range(model.latent_size):
     #std = [np.mean(i[0]) for i in range(len(std[0])))]
     plt.plot(std)
     feature_df.columns[np.argmax(std)]
-    top_change = TopK(std,2)
+    top_change = TopK(std,TOPK)
     best_perf.update(top_change[0])
     names = list(feature_df.columns[top_change[0]])
     res = [names[i]+" "+str(round(top_change[1][i],5)) for i in range(len(top_change[1]))]
     print("Component ",i," : ",res)
-plt.savefig("Reconstructions_std.png")
+    latex_table += "$z_"+str(i)+"$"
+    for i in range(len(top_change[1])):
+        latex_table += " & "+names[i]+" ( "+str(round(top_change[1][i],5))+" ) "
+    latex_table += "\\\\ \n"
+plt.savefig("results/"+dataset_path[:-4]+"/reconstruct_std.png")
 plt.close()
 print(best_perf)
-for i in range(len(best_perf)):
+print(latex_table)
+
+
+for i in range(augmented_data.shape[1]):
     fig, ax = plt.subplots(1)
     fig.set_figwidth(10)
     fig.set_figheight(5)
-    best_perf = list(best_perf)
-    ax.eventplot(augmented_data[:,best_perf[i]], orientation='vertical', colors='orange',label="Augmented Students")
-    #ax.eventplot(X_at_risk_student[:,best_perf[i]], orientation='vertical', colors='r',label="At Risk Students")
-    #ax.eventplot(X_non_at_risk_student[:,best_perf[i]], orientation='vertical', colors='g',label="Non At Risk Students")
+    ax.eventplot(augmented_data[:,i], lineoffsets=[0] ,orientation='vertical', colors='orange',label="Augmented Students")
+    ax.eventplot(X_at_risk_student[:,i],lineoffsets=[1], orientation='vertical', colors='r',label="At Risk Students")
+    ax.eventplot(X_non_at_risk_student[:,i],lineoffsets=[2], orientation='vertical', colors='g',label="Non At Risk Students")
     ax.axes.get_xaxis().set_visible(False)
     ax.legend()
-    ax.set_ylim([min(X_train[:,best_perf[i]]),max(X_train[:,best_perf[i]])])
-    plt.savefig("test"+str(i)+".png")
+    ax.set_ylim([0,1])
+    plt.savefig("results/"+dataset_path[:-4]+"/dimension__"+feature_df.columns[i]+"__"+str(i)+".png")

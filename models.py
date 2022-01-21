@@ -63,7 +63,8 @@ class BetaVAE(nn.Module):
         for student in x:
             res = []
             mu, logvar = self.encode(student)
-            z = self.sample(mu, logvar)
+            std = torch.exp(0.5*logvar)  # e^(1/2 * log(std^2))
+            z = mu
             values = torch.linspace(-range, range, steps)
             for i in values:
                 z[dimension] = i
