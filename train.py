@@ -10,11 +10,11 @@ seed_everything(SEED)
 args = {}
 args["batch_size"] = 8
 args["epochs"] = 1000
-args["augmentation_factor"] = 2
+args["augmentation_factor"] = 2 #How many times we add an augmented version of
+# at risk students to the dataset
 args["lr"] = 0.001
 args["beta"] = 2
 args["neurons_num"] = [48,32]
-args["weight_decay"] = 0
 
 
 dataset_path = "xAPI-Edu-Data.csv"

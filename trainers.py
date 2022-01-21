@@ -14,7 +14,7 @@ def augment_betaVAE(X,args,eval=False):
     train_loader =  DataLoader(X, batch_size=args["batch_size"])
     num_epochs = args["epochs"]
     model = BetaVAE(feature_dim=len(X[0]),beta=args["beta"])
-    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"],weight_decay=args["weight_decay"])
+    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"])
     for epoch in range(args["epochs"]):
         loop = tqdm(train_loader)
         for x in loop:        
@@ -77,7 +77,7 @@ def train_and_eval_NN(X,y,X_test,y_test,args):
                                     shuffle=True)
     num_epochs = args["epochs"]
     model = DNN(args["neurons_num"])
-    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"],weight_decay=args["weight_decay"])
+    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"])
     f_loss = torch.nn.CrossEntropyLoss()
     for epoch in range(args["epochs"]):
         correct = 0
@@ -119,7 +119,7 @@ def train_and_eval_NN_class_weights(X,y,X_test,y_test,args):
     model = DNN(args["neurons_num"])
     class_weights = class_weight.compute_class_weight('balanced',np.unique(y),y)
     class_weights = torch.tensor(class_weights,dtype=torch.float)
-    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"],weight_decay=args["weight_decay"])
+    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"])
     f_loss = torch.nn.CrossEntropyLoss(weight=class_weights)
     for epoch in range(args["epochs"]):
         correct = 0
@@ -162,7 +162,7 @@ def train_and_eval_NN_oversampling(X,y,X_test,y_test,args):
     model = DNN(args["neurons_num"])
     class_weights = class_weight.compute_class_weight('balanced',np.unique(y),y)
     class_weights = torch.tensor(class_weights,dtype=torch.float)
-    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"],weight_decay=args["weight_decay"])
+    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"])
     f_loss = torch.nn.CrossEntropyLoss(weight=class_weights)
     for epoch in range(args["epochs"]):
         correct = 0
@@ -206,7 +206,7 @@ def train_and_eval_NN_undersampling(X,y,X_test,y_test,args):
     model = DNN(args["neurons_num"])
     class_weights = class_weight.compute_class_weight('balanced',np.unique(y),y)
     class_weights = torch.tensor(class_weights,dtype=torch.float)
-    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"],weight_decay=args["weight_decay"])
+    optimizer = torch.optim.Adam(model.parameters(),lr=args["lr"])
     f_loss = torch.nn.CrossEntropyLoss(weight=class_weights)
     for epoch in range(args["epochs"]):
         correct = 0
