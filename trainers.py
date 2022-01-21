@@ -1,6 +1,5 @@
 import torch
 import torch.optim
-from torch.random import seed
 from  torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
 import numpy as np

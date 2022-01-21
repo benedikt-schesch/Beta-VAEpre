@@ -1,10 +1,8 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 from sklearn import preprocessing
-from sympy import latex
 from utils import *
 from trainers import *
-import random
 import matplotlib.pyplot as plt
 
 def TopK(x, k):
