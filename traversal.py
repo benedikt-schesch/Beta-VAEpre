@@ -38,7 +38,6 @@ print("Data Imbalance: ",100*(1-sum(Y)/len(Y)),"%")
 
 X = preprocessing.normalize(X)
 
-#X_train, X_test, y_train, y_test = balanced_train_test_generator(X,Y)
 X_train, X_test, y_train, y_test = train_test_split(X.astype(np.float32),Y,test_size=0.25, stratify = Y,random_state=SEED)
 print("Data Train Imbalance: ",100*(1-sum(y_train)/len(y_train)),"%")
 print("Data Test Imbalance: ",100*(1-sum(y_test)/len(y_test)),"%")
@@ -90,7 +89,7 @@ for i in range(len(best_perf)):
     fig.set_figheight(5)
     best_perf = list(best_perf)
     ax.eventplot(augmented_data[:,best_perf[i]], orientation='vertical', colors='orange',label="Augmented Students")
-    ax.eventplot(X_at_risk_student[:,best_perf[i]], orientation='vertical', colors='r',label="At Risk Students")
+    #ax.eventplot(X_at_risk_student[:,best_perf[i]], orientation='vertical', colors='r',label="At Risk Students")
     #ax.eventplot(X_non_at_risk_student[:,best_perf[i]], orientation='vertical', colors='g',label="Non At Risk Students")
     ax.axes.get_xaxis().set_visible(False)
     ax.legend()

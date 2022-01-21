@@ -23,8 +23,7 @@ class BetaVAE(nn.Module):
 
         # decoder
         self.decoder = nn.Sequential(
-            nn.LazyLinear(feature_dim),
-            nn.Softmax()
+            nn.LazyLinear(feature_dim)
         )
         self.fc_z = nn.Linear(latent_size, latent_size*2)
 
@@ -49,7 +48,7 @@ class BetaVAE(nn.Module):
 
     def loss(self, recon_x, x, mu, logvar):
         # reconstruction losses are summed over all elements and batch
-        recon_loss = F.binary_cross_entropy(recon_x, x, reduction='sum')
+        recon_loss = F.mse_loss(recon_x, x, reduction='sum')
 
         # see Appendix B from VAE paper:
         # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
@@ -64,29 +63,24 @@ class BetaVAE(nn.Module):
         for student in x:
             res = []
             mu, logvar = self.encode(student)
-            std = torch.exp(0.5*logvar)
             z = self.sample(mu, logvar)
             values = torch.linspace(-range, range, steps)
             for i in values:
-                z[dimension] = mu[dimension]+i*std[dimension]
+                z[dimension] = i
                 rx = self.decode(z)
                 res.append(rx)
             results.append(res)
         return results
 
 class DNN(nn.Module):
-    def __init__(self, neurons_num, dropout_prob):
+    def __init__(self, neurons_num):
         super().__init__()
-
-        self.codename = 'dnn'
-
-        self.layers = nn.Sequential(
-            nn.LazyLinear(neurons_num[0]),
-            nn.LeakyReLU(),
-            nn.LazyLinear(neurons_num[1]),
-            nn.LeakyReLU(),
-            nn.LazyLinear(2)
-        )
+        modules = []
+        for num in neurons_num:
+            modules.append(nn.LazyLinear(num))
+            modules.append(nn.LeakyReLU())
+        modules.append(nn.LazyLinear(2))
+        self.layers = nn.Sequential(*modules)
     
     def forward(self, batch):
         return self.layers(batch)

@@ -28,21 +28,6 @@ def load_data(path):
         Y = (df["G3"]>=10).to_numpy().astype(int)
     return X, Y, feature_df
 
-def balanced_train_test_generator(X,Y):
-    at_risk_student_id = np.nonzero(Y == 0)[0]
-    non_at_risk_student_id = np.nonzero(Y == 1)[0]
-
-    X_test_risk_id = np.array(random.sample(list(at_risk_student_id), int(len(at_risk_student_id)*0.25)))
-    X_test_non_risk_id = np.array(random.sample(list(non_at_risk_student_id), int(len(at_risk_student_id)*0.25)))
-    X_train_risk_id = [x for x in at_risk_student_id if x not in X_test_risk_id]
-    X_train_non_risk_id = [x for x in non_at_risk_student_id if x not in X_test_non_risk_id]
-
-    X_train = X[np.concatenate((X_train_risk_id,X_train_non_risk_id))].astype(np.float32)
-    X_test = X[np.concatenate((X_test_risk_id,X_test_non_risk_id))].astype(np.float32)
-    y_train = Y[np.concatenate((X_train_risk_id,X_train_non_risk_id))]
-    y_test = Y[np.concatenate((X_test_risk_id,X_test_non_risk_id))]
-    return X_train, X_test, y_train, y_test
-
 def seed_everything(seed: int):    
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)

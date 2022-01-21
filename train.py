@@ -2,8 +2,6 @@ import numpy as np
 from sklearn import preprocessing
 from utils import *
 from trainers import *
-from sklearn.model_selection import train_test_split
-import random
 from sklearn.model_selection import StratifiedKFold
 
 SEED = 42
@@ -15,13 +13,12 @@ args["epochs"] = 1000
 args["augmentation_factor"] = 2
 args["lr"] = 0.001
 args["beta"] = 2
-args["dropout"] = 0
 args["neurons_num"] = [48,32]
 args["weight_decay"] = 0
 
 
-#dataset_path = "xAPI-Edu-Data.csv"
-dataset_path = "student-por.csv"
+dataset_path = "xAPI-Edu-Data.csv"
+#dataset_path = "student-por.csv"
 
 X, Y, _ = load_data(dataset_path)
 
@@ -31,8 +28,6 @@ print("Data Imbalance: ",100*(1-sum(Y)/len(Y)),"%")
 X = preprocessing.normalize(X)
 X = X.astype(np.float32)
 kf = StratifiedKFold(n_splits=4,shuffle=True,random_state=SEED)
-#X_train, X_test, y_train, y_test = balanced_train_test_generator(X,Y)
-#X_train, X_test, y_train, y_test = train_test_split(X.astype(np.float32),Y,test_size=0.25, stratify = Y,random_state=SEED)
 results = [[],[],[],[],[]]
 for fold_idx, (train_index, test_index) in enumerate(kf.split(X, Y)):
     X_train, y_train = X[train_index], Y[train_index]
@@ -47,7 +42,6 @@ for fold_idx, (train_index, test_index) in enumerate(kf.split(X, Y)):
 
     X_train_augmented = np.concatenate([X_at_risk_augmented,np.stack([X_train[i] for i in range(len(X_train)) if i not in at_risk_student_id])])
     y_train_augmented = np.array([0 for i in X_at_risk_augmented]+[1 for i in range(len(X_train)) if i not in at_risk_student_id])
-    args["neurons_num"] = [len(X_train_augmented[0])]+args["neurons_num"]
     print("Data Augmented Train Imbalance: ",100*(1-sum(y_train_augmented)/len(y_train_augmented)),"%")
 
     results[0].append(train_and_eval_NN(X_train_augmented,y_train_augmented,X_test,y_test,args))
@@ -71,5 +65,5 @@ print("Final Scores Class weights ",results[4])
 data = results
 frame = pd.DataFrame.from_dict(data,orient='columns')
 frame.index = ["With augmentation (ours)","Without augmentation","Undersampling","Oversampling","Class weights"]
-frame.to_csv("RESULTS_NN_FIX_"+dataset_path)
+frame.to_csv("results/RESULT_"+"_".join([str(i) for i in args["neurons_num"]])+"_"+dataset_path)
 print(frame)
