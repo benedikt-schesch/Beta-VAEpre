@@ -65,7 +65,7 @@ class BetaVAE(nn.Module):
             z = mu
             values = torch.linspace(-range, range, steps)
             for i in values:
-                z[dimension] = i
+                z[dimension] = mu[dimension]+i*std[dimension]
                 rx = self.decode(z)
                 res.append(rx)
             results.append(res)
