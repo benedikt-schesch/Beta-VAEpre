@@ -72,16 +72,3 @@ plt.savefig("results/"+dataset_path[:-4]+"/reconstruct_std.pdf")
 plt.close()
 print(best_perf)
 print(latex_table)
-
-
-# for i in range(augmented_data.shape[1]):
-#     fig, ax = plt.subplots(1)
-#     fig.set_figwidth(10)
-#     fig.set_figheight(5)
-#     ax.eventplot(augmented_data[:,i], lineoffsets=[0] ,orientation='vertical', colors='orange',label="Augmented Students")
-#     ax.eventplot(X_at_risk_student[:,i],lineoffsets=[1], orientation='vertical', colors='r',label="At Risk Students")
-#     ax.eventplot(X_non_at_risk_student[:,i],lineoffsets=[2], orientation='vertical', colors='g',label="Non At Risk Students")
-#     ax.axes.get_xaxis().set_visible(False)
-#     ax.legend()
-#     ax.set_ylim([0,1])
-#     plt.savefig("results/"+dataset_path[:-4]+"/dimension__"+feature_df.columns[i]+"__"+str(i)+".png")
