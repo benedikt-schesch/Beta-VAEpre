@@ -14,7 +14,7 @@ args["augmentation_factor"] = 2 #How many times we add an augmented version of
 # at risk students to the dataset
 args["lr"] = 0.001
 args["beta"] = 2
-args["neurons_num"] = [48,32]
+args["neurons_num"] = [] #[48,32]
 
 
 dataset_path = "xAPI-Edu-Data.csv"
